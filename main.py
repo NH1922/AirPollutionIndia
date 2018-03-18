@@ -24,8 +24,13 @@ def POLLUTIONREPORT(lattitude,longitude):
     response = urllib.request.urlopen(request_url).read()
     json_obj = str(response,'utf-8')
     pollution_data = json.loads(json_obj)
-    for key,value in pollution_data['data'].items():
-        print(key,":",value)
+    #for key,value in pollution_data['data'].items():
+        #print(key,":",value)
+    print("Air Quality :",pollution_data['data']['text'])
+    print("Alert :",pollution_data['data']['alert'])
+    print("Value :",pollution_data['data']['value'])
+    print("Temperature :",pollution_data['data']['temp'])
+    
     
 
 address = input("City >")
