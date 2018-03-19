@@ -17,7 +17,7 @@ def GEOLOCATION(address):
     lattitude,longitude = str(res['geometry']['location']['lat']),str(res['geometry']['location']['lng'])
     return lattitude,longitude   
 
-def POLLUTIONREPORT(lattitude,longitude):
+def POLLUTIONREPORT(lattitude,longitude,address):
     url="http://api.airpollutionapi.com/1.0/aqi?"
     request_url = url + "lat="+lattitude+"&"+"lon="+longitude+"&APPID="+config.apikey
     response = urllib.request.urlopen(request_url).read()
@@ -25,7 +25,7 @@ def POLLUTIONREPORT(lattitude,longitude):
     pollution_data = json.loads(json_obj)
     #for key,value in pollution_data['data'].items():
         #print(key,":",value)
-    return{"Quality":pollution_data['data']['text'],"Alert":pollution_data['data']['alert'],"Value":pollution_data['data']['value'],"Temperature":pollution_data['data']['temp']}
+    return{"city":address,"Quality":pollution_data['data']['text'],"Alert":pollution_data['data']['alert'],"Value":pollution_data['data']['value'],"Temperature":pollution_data['data']['temp']}
     #print("Quality :",pollution_data['data']['text'])
     #print("Alert :",pollution_data['data']['alert'])
     #print("Value :",pollution_data['data']['value'])
@@ -39,7 +39,7 @@ db = client.AirReports
 address = input("City >")
 lattitude,longitude = GEOLOCATION(address)
 reports = db.reports
-report = POLLUTIONREPORT(lattitude, longitude)
+report = POLLUTIONREPORT(lattitude, longitude,address)
 reports.insert_one(report)
 for key, value in report.items():
     print(key,":",value)
