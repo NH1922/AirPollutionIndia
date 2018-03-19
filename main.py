@@ -4,6 +4,7 @@ import time
 import urllib.request 
 import config
 from pymongo import MongoClient
+from boto.ec2.address import Address
 
 def GEOLOCATION(address):
     geo_url = "https://maps.googleapis.com/maps/api/geocode/json?address="+address+"&key="+config.geo_api_key
@@ -32,7 +33,7 @@ def POLLUTIONREPORT(lattitude,longitude):
     
     
 #Setting up mongo db connections 
-client = MongoClient('localhost', 27017)
+client = MongoClient(config.mongohost, config.mongoport)
 #  name of the data base - AirReports
 db = client.AirReports
 address = input("City >")
