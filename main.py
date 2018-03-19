@@ -3,9 +3,7 @@ import json
 import time 
 import urllib.request 
 import config
-
-
-
+from pymongo import MongoClient
 
 def GEOLOCATION(address):
     geo_url = "https://maps.googleapis.com/maps/api/geocode/json?address="+address+"&key="+config.geo_api_key
@@ -26,17 +24,23 @@ def POLLUTIONREPORT(lattitude,longitude):
     pollution_data = json.loads(json_obj)
     #for key,value in pollution_data['data'].items():
         #print(key,":",value)
-    print("Air Quality :",pollution_data['data']['text'])
-    print("Alert :",pollution_data['data']['alert'])
-    print("Value :",pollution_data['data']['value'])
-    print("Temperature :",pollution_data['data']['temp'])
+    return{"Quality":pollution_data['data']['text'],"Alert":pollution_data['data']['alert'],"Value":pollution_data['data']['value'],"Temperature":pollution_data['data']['temp']}
+    #print("Quality :",pollution_data['data']['text'])
+    #print("Alert :",pollution_data['data']['alert'])
+    #print("Value :",pollution_data['data']['value'])
+    #print("Temperature :",pollution_data['data']['temp'])
     
     
-
+#Setting up mongo db connections 
+client = MongoClient('localhost', 27017)
+#  name of the data base - AirReports
+db = client.AirReports
 address = input("City >")
-
 lattitude,longitude = GEOLOCATION(address)
-POLLUTIONREPORT(lattitude, longitude)
-
+reports = db.reports
+report = POLLUTIONREPORT(lattitude, longitude)
+reports.insert_one(report)
+for key, value in report.items():
+    print(key,":",value)
 
     
