@@ -1,10 +1,15 @@
+from flask import Flask,render_template,flash,request,redirect
+from wtforms import Form,TextField,TextAreaField,validators,StringField,SubmitField
 import requests
 import json
-import time 
-import urllib.request 
+import time
+import urllib.request
 import config
 from pymongo import MongoClient
-from boto.ec2.address import Address
+#from boto.ec2.address import Address
+
+
+#Functions to fecth the data from geocode
 
 def GEOLOCATION(address):
     geo_url = "https://maps.googleapis.com/maps/api/geocode/json?address="+address+"&key="+config.geo_api_key
@@ -15,7 +20,9 @@ def GEOLOCATION(address):
     for keys in geo_data['results']:
         res.update(keys)
     lattitude,longitude = str(res['geometry']['location']['lat']),str(res['geometry']['location']['lng'])
-    return lattitude,longitude   
+    return lattitude,longitude
+
+#Function to find air pollution data
 
 def POLLUTIONREPORT(lattitude,longitude,address):
     url="http://api.airpollutionapi.com/1.0/aqi?"
@@ -30,18 +37,41 @@ def POLLUTIONREPORT(lattitude,longitude,address):
     #print("Alert :",pollution_data['data']['alert'])
     #print("Value :",pollution_data['data']['value'])
     #print("Temperature :",pollution_data['data']['temp'])
-    
-    
-#Setting up mongo db connections 
-client = MongoClient(config.mongohost, config.mongoport)
-#  name of the data base - AirReports
-db = client.AirReports
-address = input("City >")
-lattitude,longitude = GEOLOCATION(address)
-reports = db.reports
-report = POLLUTIONREPORT(lattitude, longitude,address)
-reports.insert_one(report)
-for key, value in report.items():
-    print(key,":",value)
 
-    
+
+
+
+
+app = Flask(__name__)
+app.secret_key = "123456789"
+
+class cityform(Form):
+    name = StringField("City", validators=[validators.required()])
+    submit = SubmitField("submit")
+@app.route("/",methods = ["POST","GET"])
+def  HOME():
+    #Setting up mongo db connections 
+    client = MongoClient(config.mongohost, config.mongoport)
+    #  name of the data base - AirReports
+    db = client.AirReports
+    form = cityform(request.form)
+    reports = db.reports
+    if request.method == "POST" and form.validate():
+        city = form.name.data
+        print(city)
+        lattitude,longitude = GEOLOCATION(city)
+        report = POLLUTIONREPORT(lattitude, longitude,city)
+        reports.insert_one(report)
+        print (report)
+        return render_template("result.html",report = report)
+        flash("success !")
+    else:
+        print("faliure")
+
+    return render_template("Home.html",form = form)
+
+
+
+
+if __name__ == "__main__":
+    app.run(debug = True)
