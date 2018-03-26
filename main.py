@@ -5,12 +5,9 @@ import json
 import time
 import urllib.request
 import config
-<<<<<<< HEAD
 from pymongo import MongoClient
 #from boto.ec2.address import Address
 
-=======
->>>>>>> 2bc6364ebe9256afcfac7e933f55f640de6e77dc
 
 #Functions to fecth the data from geocode
 
@@ -53,25 +50,18 @@ class cityform(Form):
     submit = SubmitField("submit")
 @app.route("/",methods = ["POST","GET"])
 def  HOME():
-<<<<<<< HEAD
     #Setting up mongo db connections 
     client = MongoClient(config.mongohost, config.mongoport)
     #  name of the data base - AirReports
     db = client.AirReports
     form = cityform(request.form)
     reports = db.reports
-=======
-    form = cityform(request.form)
->>>>>>> 2bc6364ebe9256afcfac7e933f55f640de6e77dc
     if request.method == "POST" and form.validate():
         city = form.name.data
         print(city)
         lattitude,longitude = GEOLOCATION(city)
         report = POLLUTIONREPORT(lattitude, longitude,city)
-<<<<<<< HEAD
         reports.insert_one(report)
-=======
->>>>>>> 2bc6364ebe9256afcfac7e933f55f640de6e77dc
         print (report)
         return render_template("result.html",report = report)
         flash("success !")
@@ -84,8 +74,4 @@ def  HOME():
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
     app.run(debug = True)
-=======
-    app.run(debug = True)
->>>>>>> 2bc6364ebe9256afcfac7e933f55f640de6e77dc
