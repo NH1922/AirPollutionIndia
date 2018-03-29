@@ -1,9 +1,36 @@
-{% block body %}
-<form action "/" method = "POST" >
-{{form.name.label}}{{form.name()}}
-{{form.submit()}}
-</form>
-
-{%endblock%}
+{% extends "bootstrap/base.html" %}
+{% block title %}HOME{% endblock %}
+{%import "bootstrap/wtf.html" as wtf%}
 
 
+{% block content %}
+  <h1>Fill in the details</h1>
+  <form method="post" role="form" action = "/">
+  {{ wtf.form_errors(form, hiddens="only") }}
+  {{ wtf.form_field(form.name) }}
+  {{form.submit()}}
+  
+  </form>
+{% endblock %}
+
+{% block styles %}
+{{super()}}
+<link rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+{% endblock %}
+
+{% block scripts %}
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+{{super()}}
+{% endblock %}
+
+
+
+{% block navbar %}
+<div class="topnav">
+  <a class="active" href="/">Home</a>
+  <a href="/display">Cities</a>
+  <a href="#contact">Contact</a>
+  <a href="#about">About</a>
+</div>
+{% endblock %}

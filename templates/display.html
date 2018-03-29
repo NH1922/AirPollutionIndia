@@ -1,0 +1,10 @@
+{% extends "bootstrap/base.html" %}
+{% block title %}Cities{% endblock %}
+
+{%block content%}
+<ul class = "list-group">
+{%for city in cities%}
+	<li class = "list-group-item"><a href = "data/{{city}}">{{city}}</a></li>
+{%endfor%}
+</ul>
+{%endblock%}

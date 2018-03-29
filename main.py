@@ -6,6 +6,10 @@ import time
 import urllib.request
 import config
 from pymongo import MongoClient
+from flask_bootstrap import Bootstrap
+from time import sleep
+from werkzeug.utils import redirect
+from flask.helpers import url_for
 #from boto.ec2.address import Address
 
 
@@ -38,18 +42,16 @@ def POLLUTIONREPORT(lattitude,longitude,address):
     #print("Value :",pollution_data['data']['value'])
     #print("Temperature :",pollution_data['data']['temp'])
 
-
-
-
-
 app = Flask(__name__)
 app.secret_key = "123456789"
+Bootstrap(app)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 class cityform(Form):
     name = StringField("City", validators=[validators.required()])
     submit = SubmitField("submit")
 @app.route("/",methods = ["POST","GET"])
-def  HOME():
+def HOME():
     #Setting up mongo db connections 
     client = MongoClient(config.mongohost, config.mongoport)
     #  name of the data base - AirReports
@@ -57,21 +59,41 @@ def  HOME():
     form = cityform(request.form)
     reports = db.reports
     if request.method == "POST" and form.validate():
-        city = form.name.data
-        print(city)
-        lattitude,longitude = GEOLOCATION(city)
-        report = POLLUTIONREPORT(lattitude, longitude,city)
-        reports.insert_one(report)
-        print (report)
-        return render_template("result.html",report = report)
-        flash("success !")
+        city_names = form.name.data
+        city_names = city_names.split(",")
+        print(city_names)
+        for city in city_names:
+            lattitude,longitude = GEOLOCATION(city)
+            report = POLLUTIONREPORT(lattitude, longitude,city)
+            reports.insert_one(report)
+            #print (report)
+            #return render_template("result.html",report = report)
+        
     else:
         print("faliure")
 
     return render_template("Home.html",form = form)
-
-
-
+@app.route("/display")
+def DISPLAY():
+    client = MongoClient(config.mongohost, config.mongoport)
+    db = client.AirReports
+    reports = db.reports
+    data = reports.find()
+    cities = []
+    for details in data:
+        cities.append(details['city'])
+    print(cities)
+    return render_template("display.html",cities=cities)
+@app.route("/data/<string:cityid>/")
+def DATA(cityid):
+    client = MongoClient(config.mongohost, config.mongoport)
+    db = client.AirReports
+    reports = db.reports
+    for city in reports.find({'city':cityid}):
+        print(city)
+    return render_template("result.html",report = city)
 
 if __name__ == "__main__":
+    app.jinja_env.auto_reload = True
+    app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.run(debug = True)
