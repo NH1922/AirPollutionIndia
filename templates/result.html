@@ -1,9 +1,11 @@
 {% block body %}
 
-{% for key,value in report.items() %}
+<h1>CITY : {{report.city}}</h1>
+
+{% for key,value in report.data.items() %}
 
 <div>
-<h1>{{key}} :{{value}} </h1>
+<h2>{{key}} :{{value}} </h2>
 </div>
 {% endfor %}
 

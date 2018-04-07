@@ -5,11 +5,14 @@ import json
 import time
 import urllib.request
 import config
+import cronjob
 from pymongo import MongoClient
 from flask_bootstrap import Bootstrap
 from time import sleep
 from werkzeug.utils import redirect
 from flask.helpers import url_for
+from apscheduler.schedulers.background import BackgroundScheduler
+# crontab import CronTab
 #from boto.ec2.address import Address
 
 
@@ -34,13 +37,28 @@ def POLLUTIONREPORT(lattitude,longitude,address):
     response = urllib.request.urlopen(request_url).read()
     json_obj = str(response,'utf-8')
     pollution_data = json.loads(json_obj)
+    city = {'city':address}
+    return ({**city,**pollution_data})
     #for key,value in pollution_data['data'].items():
         #print(key,":",value)
-    return{"city":address,"Quality":pollution_data['data']['text'],"Alert":pollution_data['data']['alert'],"Value":pollution_data['data']['value'],"Temperature":pollution_data['data']['temp']}
+    #return"city":address,"Quality":pollution_data['data']['text'],"Alert":pollution_data['data']['alert'],"Value":pollution_data['data']['value'],"Temperature":pollution_data['data']['temp']}
     #print("Quality :",pollution_data['data']['text'])
     #print("Alert :",pollution_data['data']['alert'])
-    #print("Value :",pollution_data['data']['value'])
+    #print("Value :",pollution_datda['data']['value']n3)
     #print("Temperature :",pollution_data['data']['temp'])
+''' A sample function to schedule a cronjob
+def set_cron_job():
+    from crontab import CronTab
+    my_cron = CronTab()
+    job = my_cron.new(command = 'python3 cronjob.py')
+    job.minute.every(10)
+    my_cron.write()'''
+
+def schedule_calls():
+    scheduler = BackgroundScheduler()
+    job = scheduler.add_job(cronjob.Update, 'interval', hours=1)
+    scheduler.start()
+
 
 app = Flask(__name__)
 app.secret_key = "123456789"
@@ -52,7 +70,7 @@ class cityform(Form):
     submit = SubmitField("submit")
 @app.route("/",methods = ["POST","GET"])
 def HOME():
-    #Setting up mongo db connections 
+    #Setting up mongo db connections
     client = MongoClient(config.mongohost, config.mongoport)
     #  name of the data base - AirReports
     db = client.AirReports
@@ -63,15 +81,21 @@ def HOME():
         city_names = city_names.split(",")
         print(city_names)
         for city in city_names:
-            lattitude,longitude = GEOLOCATION(city)
-            report = POLLUTIONREPORT(lattitude, longitude,city)
-            reports.insert_one(report)
-            #print (report)
-            #return render_template("result.html",report = report)
-        
+            if reports.find({'city':city}).count() != 0:
+                lattitude,longitude = GEOLOCATION(city)
+                report = POLLUTIONREPORT(lattitude, longitude,city)
+                reports.update({'city':city},report)
+            else:
+                lattitude,longitude = GEOLOCATION(city)
+                report = POLLUTIONREPORT(lattitude, longitude,city)
+                reports.insert_one(report)
+                #print (report)
+                #return render_template("result.html",report = report)
+
     else:
         print("faliure")
-
+    schedule_calls()
+    print("Function called ! ")
     return render_template("Home.html",form = form)
 @app.route("/display")
 def DISPLAY():
