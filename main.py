@@ -1,23 +1,17 @@
-from flask import Flask,render_template,flash,request,redirect
-from wtforms import Form,TextField,TextAreaField,validators,StringField,SubmitField
-import requests
+from flask import Flask, render_template, flash, request, redirect
+from wtforms import Form,TextField, TextAreaField, validators, StringField, SubmitField
 import json
-import time
 import urllib.request
 import config
 import cronjob
 from pymongo import MongoClient
 from flask_bootstrap import Bootstrap
-from time import sleep
-from werkzeug.utils import redirect
-from flask.helpers import url_for
 from apscheduler.schedulers.background import BackgroundScheduler
-# crontab import CronTab
-#from boto.ec2.address import Address
+from pollution_report import PollutionData
+from threading import Thread
 
 
-#Functions to fecth the data from geocode
-
+"""
 def GEOLOCATION(address):
     geo_url = "https://maps.googleapis.com/maps/api/geocode/json?address="+address+"&key="+config.geo_api_key
     geo_response = urllib.request.urlopen(geo_url).read()
@@ -53,6 +47,7 @@ def set_cron_job():
     job = my_cron.new(command = 'python3 cronjob.py')
     job.minute.every(10)
     my_cron.write()'''
+"""
 
 def schedule_calls():
     scheduler = BackgroundScheduler()
@@ -68,7 +63,9 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 class cityform(Form):
     name = StringField("City", validators=[validators.required()])
     submit = SubmitField("submit")
-@app.route("/",methods = ["POST","GET"])
+
+
+@app.route("/", methods = ["POST", "GET"])
 def HOME():
     #Setting up mongo db connections
     client = MongoClient(config.mongohost, config.mongoport)
@@ -82,21 +79,25 @@ def HOME():
         print(city_names)
         for city in city_names:
             if reports.find({'city':city}).count() != 0:
-                lattitude,longitude = GEOLOCATION(city)
-                report = POLLUTIONREPORT(lattitude, longitude,city)
-                reports.update({'city':city},report)
+                '''report = PollutionData(city,'U')
+                reports.update({'city':city},report)'''
+                t = Thread(target=PollutionData,args=(city, 'U'))
+                t.start()
+                
             else:
-                lattitude,longitude = GEOLOCATION(city)
-                report = POLLUTIONREPORT(lattitude, longitude,city)
+                '''report = PollutionData(city,'A')
                 reports.insert_one(report)
                 #print (report)
-                #return render_template("result.html",report = report)
+                #return render_template("result.html",report = report)'''
+                PollutionData(city, 'A')
 
     else:
         print("faliure")
     schedule_calls()
     print("Function called ! ")
     return render_template("Home.html",form = form)
+
+
 @app.route("/display")
 def DISPLAY():
     client = MongoClient(config.mongohost, config.mongoport)
@@ -108,6 +109,8 @@ def DISPLAY():
         cities.append(details['city'])
     print(cities)
     return render_template("display.html",cities=cities)
+
+
 @app.route("/data/<string:cityid>/")
 def DATA(cityid):
     client = MongoClient(config.mongohost, config.mongoport)
