@@ -7,12 +7,15 @@ def PollutionData(latlong,pollutionreports,address):
     lattitude,longitude = latlong
     url = "http://api.airpollutionapi.com/1.0/aqi?"
     request_url = url + "lat=" + str(lattitude) + "&" + "lon=" + str(longitude) + "&APPID=" + config.apikey
+    print(request_url)
     response = urllib.request.urlopen(request_url).read()
     json_obj = str(response, 'utf-8')
     pollution_data = json.loads(json_obj)
     city = {'city': address}
     report = ({**city, **pollution_data})
+    print(report)
     pollutionreports.append(report)
+
 
     '''if (option == 'U'):
         reports.update({'city': city}, report)
