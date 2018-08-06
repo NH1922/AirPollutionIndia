@@ -1,5 +1,6 @@
 from flask import Flask, render_template, flash, request, redirect
-from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField
+from wtforms import TextField, TextAreaField, validators, StringField, SubmitField
+from flask_wtf import Form
 import config
 import cronjob
 from pymongo import MongoClient
@@ -25,7 +26,7 @@ def schedule_calls():
 
 class cityform(Form):
     name = StringField("City", validators=[validators.required()])
-    submit = SubmitField("submit")
+    #submit = SubmitField("SUBMIT")
 
 
 @app.route("/", methods=["POST", "GET"])

@@ -4,13 +4,16 @@
 
 
 {% block content %}
-  <h1>Fill in the details</h1>
-  <form method="post" role="form" action = "/">
-  {{ wtf.form_errors(form, hiddens="only") }}
-  {{ wtf.form_field(form.name) }}
-  {{form.submit()}}
 
-  </form>
+    <div class = "container">
+        <h1>Fill in the details</h1>
+        <form method="post" role="form" action = "/">
+            <d1>
+            {{ wtf.quick_form(form) }}
+                <input class="btn btn-primary" type = "submit" value="SUBMIT">
+            </d1>
+        </form>
+    </div>
 {% endblock %}
 
 {% block styles %}
