@@ -1,10 +1,19 @@
 {% extends "bootstrap/base.html" %}
 {% block title %}Cities{% endblock %}
+{% include 'includes/_navbar.html' %}
+
 
 {%block content%}
+    <div class ="container">
+     <h1>Cities</h1>
+    </div>
+<div class="container">
 <ul class = "list-group">
 {%for city in cities%}
+    <div>
 	<li class = "list-group-item"><a href = "data/{{city}}">{{city}}</a></li>
+    </div>
 {%endfor%}
 </ul>
+    </div>
 {%endblock%}

@@ -1,15 +1,13 @@
-import requests
-import json
-import time
-import urllib.request
 import config
-import main
 from pymongo import MongoClient
-#from pollution_report import PollutionData
-from pollutiondata import PollutionData
+from pollutiondata import pollution_data
 from threading import Thread
 
-def Update():
+client = MongoClient(config.mongohost, config.mongoport)
+db = client.AirReports
+reports = db.reports
+
+def update():
     client = MongoClient(config.mongohost, config.mongoport)
     db = client.AirReports
     reports = db.reports
@@ -24,7 +22,7 @@ def Update():
                               details['data']['coordinates']['longitude']]))
     print(cities)
     for i in range (len(cities)):
-        t = Thread(target=PollutionData,args=(latlongs[i],polltionreports,cities[i]))
+        t = Thread(target=pollution_data, args=(latlongs[i], polltionreports, cities[i]))
         threads.append(t)
     for x in threads:
         x.start()
@@ -32,10 +30,15 @@ def Update():
         x.join()
     for details in polltionreports:
         print(details)
-        reports.update({'city':details['city']},details)
 
-        '''report = PollutionData(city)
+    reports.insert_many(polltionreports)
+
+    '''report = PollutionData(city)
         reports.update({'city':city},report)'''
     print ("Cron job called ! ")
 
+data = reports.distinct('city')
+print(data)
 
+for data in  reports.find({'city':'Panaji'}):
+    print(data)

@@ -1,17 +1,17 @@
 import config
 import urllib.request
 import json
-from pollutiondata import PollutionData
+from pollutiondata import pollution_data
 from threading import Thread
 import geocoder
 
-def GEOLOCATION(address,pollutionreports):
+def geolocation(address, pollution_reports):
     g = geocoder.google(address)
     #lattitude,longitude = g.latlng
     #print(lattitude,longitude)
     #result = list([lattitude,longitude])
     print(g.latlng)
-    PollutionData(g.latlng,pollutionreports,address)
+    pollution_data(g.latlng, pollution_reports, address)
 
     #geocodelist.append(list([str(res['geometry']['location']['lat']),str(res['geometry']['location']['lng'])]))
 

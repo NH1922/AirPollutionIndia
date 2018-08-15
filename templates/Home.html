@@ -1,7 +1,7 @@
 {% extends "bootstrap/base.html" %}
 {% block title %}HOME{% endblock %}
 {%import "bootstrap/wtf.html" as wtf%}
-
+{% include 'includes/_navbar.html' %}
 
 {% block content %}
 
@@ -10,7 +10,7 @@
         <form method="post" role="form" action = "/">
             <d1>
             {{ wtf.quick_form(form) }}
-                <input class="btn btn-primary" type = "submit" value="SUBMIT">
+                <input class="btn btn-primary btn-block" type = "submit" value="SUBMIT">
             </d1>
         </form>
     </div>
@@ -24,16 +24,9 @@
 
 {% block scripts %}
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-{{super()}}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
 {% endblock %}
 
 
 
-{% block navbar %}
-<div class="topnav">
-  <a class="active" href="/">Home</a>
-  <a href="/display">Cities</a>
-  <a href="#contact">Contact</a>
-  <a href="#about">About</a>
-</div>
-{% endblock %}

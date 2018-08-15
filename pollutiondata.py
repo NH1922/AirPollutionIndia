@@ -2,7 +2,8 @@ import json
 import config
 import urllib.request
 
-def PollutionData(latlong,pollutionreports,address):
+
+def pollution_data(latlong, pollution_reports, address):
     '''Using air pollution api to fetch data'''
     lattitude,longitude = latlong
     url = "http://api.airpollutionapi.com/1.0/aqi?"
@@ -10,11 +11,11 @@ def PollutionData(latlong,pollutionreports,address):
     print(request_url)
     response = urllib.request.urlopen(request_url).read()
     json_obj = str(response, 'utf-8')
-    pollution_data = json.loads(json_obj)
+    fetched_pollution_data = json.loads(json_obj)
     city = {'city': address}
-    report = ({**city, **pollution_data})
+    report = ({**city, **fetched_pollution_data})
     print(report)
-    pollutionreports.append(report)
+    pollution_reports.append(report)
 
 
     '''if (option == 'U'):
