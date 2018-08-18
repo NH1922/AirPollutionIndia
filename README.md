@@ -1,4 +1,4 @@
-# AirPollutionIndia
+# Fresh Air ! A pollution report Webapp 
 Allows the user to check the levels of pollutions in India on the basis of the city
 
 A simple Flask application to fetch Air Pollution reports of cities in India and use the data for greater benefits. 
