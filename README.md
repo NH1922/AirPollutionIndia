@@ -4,7 +4,7 @@ Allows the user to check the levels of pollutions in India on the basis of the c
 A simple Flask application to fetch Air Pollution reports of cities in India and use the data for greater benefits. 
 Reports are stored in a MongoDB database. 
 
-<h1>Expected Functionalities</h1> : 
+<h1>Expected Functionalities</h1>  
 
 1. Cities to be added by the user
 2. Displaying pollution reports corresponding to the added cities. 
@@ -12,7 +12,7 @@ Reports are stored in a MongoDB database.
 4. A decent front end to do all of the above. 
 5. Improved performance using threads. 
 
-<h1>Requirements</h1> : 
+<h1>Requirements</h1> 
 
 Python3 with pip
 
